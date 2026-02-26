@@ -14,6 +14,10 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
+  /* Workspace accent — dynamically changed by JS */
+  --ws-accent:      #06b6d4;
+  --ws-accent-dim:  rgba(6,182,212,.15);
+  --ws-accent-border: rgba(6,182,212,.25);
   --bg:         #0a0a0f;
   --bg-2:       #0d0d14;
   --surface:    rgba(255,255,255,.03);
@@ -106,11 +110,26 @@ body {
   height: 100vh;
   background: rgba(10,10,15,.92);
   border-right: 1px solid var(--border);
+  position: relative;
+  transition: border-color .4s;
   display: flex; flex-direction: column;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   z-index: 100;
-  overflow: hidden;
+  
+
+/* Workspace tint on sidebar */
+.sidebar::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--ws-accent);
+  opacity: .9;
+  transition: background .4s;
+  pointer-events: none;
+}
+overflow: hidden;
 }
 
 .sidebar-logo {
@@ -131,7 +150,80 @@ body {
 .sidebar-logo-text { font-weight: 800; font-size: 15px; color: #fff; letter-spacing: -.02em; }
 .sidebar-logo-text span { color: var(--cyan); }
 
-.sidebar-section-label {
+.sidebar-section-
+
+/* ══════════════════════════════════════════
+   WORKSPACE SWITCHER
+══════════════════════════════════════════ */
+.ws-switcher {
+  position: relative;
+  padding: 10px 10px 6px;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.ws-trigger {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all .2s;
+  background: var(--ws-accent-dim);
+  border: 1px solid var(--ws-accent-border);
+  user-select: none;
+}
+.ws-trigger:hover { filter: brightness(1.1); }
+
+.ws-trigger-icon { font-size: 18px; flex-shrink: 0; }
+.ws-trigger-body { flex: 1; min-width: 0; }
+.ws-trigger-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text-faint); line-height: 1; }
+.ws-trigger-name { font-size: 13px; font-weight: 700; color: var(--ws-accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.4; transition: color .3s; }
+.ws-trigger-arrow { font-size: 11px; color: var(--text-faint); transition: transform .2s; flex-shrink: 0; }
+.ws-trigger-arrow.open { transform: rotate(180deg); }
+
+.ws-dropdown {
+  position: absolute;
+  top: calc(100% - 2px); left: 10px; right: 10px;
+  background: #15151e;
+  border: 1px solid var(--border-hi);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 12px 40px rgba(0,0,0,.6);
+  z-index: 200;
+  overflow: hidden;
+  display: none;
+  animation: dropIn .2s ease;
+}
+.ws-dropdown.open { display: block; }
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.ws-dropdown-header { padding: 10px 14px 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-faint); }
+
+.ws-option {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background .15s;
+  border: 1px solid transparent;
+  margin: 3px 6px;
+  border-radius: 8px;
+}
+.ws-option:hover { background: var(--glass-hi); }
+.ws-option.active { background: var(--ws-accent-dim); border-color: var(--ws-accent-border); }
+
+.ws-option-icon { font-size: 18px; flex-shrink: 0; }
+.ws-option-body { flex: 1; min-width: 0; }
+.ws-option-name { font-size: 13px; font-weight: 600; color: #fff; }
+.ws-option-desc { font-size: 11px; color: var(--text-dim); margin-top: 1px; }
+.ws-option-check { font-size: 14px; flex-shrink: 0; }
+.ws-swatch { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.ws-dropdown-divider { height: 1px; background: var(--border); margin: 4px 6px; }
+
+
+label {
   font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
   color: var(--text-faint); padding: 16px 20px 6px;
 }
@@ -908,7 +1000,11 @@ body {
 }
 
 @media (max-width: 900px) {
-  :root { --sidebar-w: 60px; }
+  :root {
+  /* Workspace accent — dynamically changed by JS */
+  --ws-accent:      #06b6d4;
+  --ws-accent-dim:  rgba(6,182,212,.15);
+  --ws-accent-border: rgba(6,182,212,.25); --sidebar-w: 60px; }
   .sidebar-logo-text, .nav-item span:not(.nav-icon), .sidebar-section-label,
   .sidebar-user-info, .sidebar-user-avatar + * { display: none; }
   .nav-item { justify-content: center; padding: 10px; }
@@ -938,6 +1034,52 @@ body {
     <div class="sidebar-logo">
       <div class="sidebar-logo-icon">🚀</div>
       <div class="sidebar-logo-text">Mission<span>Control</span></div>
+    </div>
+
+    <!-- WORKSPACE SWITCHER -->
+    <div class="ws-switcher" id="ws-switcher">
+      <div class="ws-trigger" id="ws-trigger" onclick="toggleWsDropdown()">
+        <span class="ws-trigger-icon" id="ws-trigger-icon">🚀</span>
+        <div class="ws-trigger-body">
+          <div class="ws-trigger-label">Workspace</div>
+          <div class="ws-trigger-name" id="ws-trigger-name">Host Automation</div>
+        </div>
+        <span class="ws-trigger-arrow" id="ws-trigger-arrow">▾</span>
+      </div>
+      <div class="ws-dropdown" id="ws-dropdown">
+        <div class="ws-dropdown-header">Workspace wechseln</div>
+        <div class="ws-option active" data-ws="hostautomation" onclick="switchWorkspace('hostautomation')">
+          <span class="ws-option-icon">🚀</span>
+          <div class="ws-option-body">
+            <div class="ws-option-name">Host Automation</div>
+            <div class="ws-option-desc">HostPro Dashboard MVP</div>
+          </div>
+          <span class="ws-swatch" style="background:#06b6d4"></span>
+          <span class="ws-option-check" id="ws-check-hostautomation">✓</span>
+        </div>
+        <div class="ws-option" data-ws="ela" onclick="switchWorkspace('ela')">
+          <span class="ws-option-icon">🏠</span>
+          <div class="ws-option-body">
+            <div class="ws-option-name">ELA Apartments</div>
+            <div class="ws-option-desc">26 Kurzzeitvermietungs-Apartments</div>
+          </div>
+          <span class="ws-swatch" style="background:#f59e0b"></span>
+          <span class="ws-option-check" id="ws-check-ela" style="display:none">✓</span>
+        </div>
+        <div class="ws-option" data-ws="personal" onclick="switchWorkspace('personal')">
+          <span class="ws-option-icon">👤</span>
+          <div class="ws-option-body">
+            <div class="ws-option-name">Personal</div>
+            <div class="ws-option-desc">Routinen, Training, Ziele</div>
+          </div>
+          <span class="ws-swatch" style="background:#10b981"></span>
+          <span class="ws-option-check" id="ws-check-personal" style="display:none">✓</span>
+        </div>
+        <div class="ws-dropdown-divider"></div>
+        <div style="padding:8px 14px 10px;font-size:10.5px;color:var(--text-faint)">
+          Personal-Events immer im Kalender sichtbar
+        </div>
+      </div>
     </div>
 
     <nav class="sidebar-nav">
@@ -994,6 +1136,10 @@ body {
       <div style="flex:1">
         <div class="header-title" id="header-title">Dashboard</div>
         <div class="header-subtitle" id="header-subtitle">Leon's Mission Control — Übersicht</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:4px 12px;border-radius:999px;background:var(--ws-accent-dim);border:1px solid var(--ws-accent-border);color:var(--ws-accent);transition:all .3s" id="ws-header-pill">
+        <span id="ws-header-icon">🚀</span>
+        <span id="ws-header-name">Host Automation</span>
       </div>
       <div class="countdown-pill">
         <span>🎤</span>
@@ -1559,26 +1705,123 @@ body {
 const DEMO_DATE = new Date('2026-03-07T10:00:00+01:00');
 const TODAY     = new Date('2026-02-26T15:08:00+01:00');
 
+/* ══════════════════════════════════════════
+   WORKSPACE CONFIG & MANAGEMENT
+══════════════════════════════════════════ */
+const WORKSPACES = {
+  hostautomation: {
+    id: 'hostautomation',
+    icon: '🚀',
+    name: 'Host Automation',
+    accent: '#06b6d4',
+    accentDim: 'rgba(6,182,212,.15)',
+    accentBorder: 'rgba(6,182,212,.25)',
+  },
+  ela: {
+    id: 'ela',
+    icon: '🏠',
+    name: 'ELA Apartments',
+    accent: '#f59e0b',
+    accentDim: 'rgba(245,158,11,.15)',
+    accentBorder: 'rgba(245,158,11,.25)',
+  },
+  personal: {
+    id: 'personal',
+    icon: '👤',
+    name: 'Personal',
+    accent: '#10b981',
+    accentDim: 'rgba(16,185,129,.15)',
+    accentBorder: 'rgba(16,185,129,.25)',
+  },
+};
+
+let activeWorkspace = localStorage.getItem('mc-workspace') || 'hostautomation';
+
+function switchWorkspace(wsId) {
+  activeWorkspace = wsId;
+  localStorage.setItem('mc-workspace', wsId);
+  updateWorkspaceUI();
+  renderTasks();
+  renderContent();
+  renderMemory();
+  renderCalendar();
+  toggleWsDropdown();
+}
+
+function updateWorkspaceUI() {
+  const ws = WORKSPACES[activeWorkspace];
+  if (!ws) return;
+  
+  document.documentElement.style.setProperty('--ws-accent', ws.accent);
+  document.documentElement.style.setProperty('--ws-accent-dim', ws.accentDim);
+  document.documentElement.style.setProperty('--ws-accent-border', ws.accentBorder);
+  
+  document.getElementById('ws-trigger-icon').textContent = ws.icon;
+  document.getElementById('ws-trigger-name').textContent = ws.name;
+  document.getElementById('ws-header-icon').textContent = ws.icon;
+  document.getElementById('ws-header-name').textContent = ws.name;
+  
+  document.getElementById('ws-check-hostautomation').style.display = activeWorkspace === 'hostautomation' ? 'block' : 'none';
+  document.getElementById('ws-check-ela').style.display = activeWorkspace === 'ela' ? 'block' : 'none';
+  document.getElementById('ws-check-personal').style.display = activeWorkspace === 'personal' ? 'block' : 'none';
+  
+  document.querySelectorAll('.ws-option').forEach(opt => {
+    opt.classList.toggle('active', opt.dataset.ws === activeWorkspace);
+  });
+}
+
+function toggleWsDropdown() {
+  const dropdown = document.getElementById('ws-dropdown');
+  const arrow = document.getElementById('ws-trigger-arrow');
+  dropdown.classList.toggle('open');
+  arrow.classList.toggle('open');
+}
+
+document.addEventListener('click', function(e) {
+  const switcher = document.getElementById('ws-switcher');
+  if (switcher && !switcher.contains(e.target)) {
+    const dropdown = document.getElementById('ws-dropdown');
+    const arrow = document.getElementById('ws-trigger-arrow');
+    if (dropdown) dropdown.classList.remove('open');
+    if (arrow) arrow.classList.remove('open');
+  }
+});
+
 /* ─── TASKS ─── */
 let tasks = JSON.parse(localStorage.getItem('mc-tasks') || 'null') || [
-  { id: 't1',  title: 'n8n Instanz starten + Guesty-Workflow importieren',            col: 'progress', priority: 'high',   assignee: 'Pipeline', project: 'HostPro',       notes: 'n8n-workflows/guesty-sync-workflow.json' },
-  { id: 't2',  title: 'Supabase Projekt aufsetzen + Schema deployen',                col: 'progress', priority: 'high',   assignee: 'Dev',      project: 'HostPro',       notes: 'supabase/schema.sql' },
-  { id: 't3',  title: 'Next.js Frontend an Supabase Views anbinden',                 col: 'progress', priority: 'high',   assignee: 'Dev',      project: 'HostPro',       notes: '' },
-  { id: 't4',  title: 'v0 Dashboard-Mockup finalisieren (Dark Theme, KPIs)',         col: 'review',   priority: 'high',   assignee: 'Pixel',    project: 'HostPro',       notes: 'HostPro - world-class SaaS Look' },
-  { id: 't5',  title: 'AI Chat Interface implementieren (GPT-4o + Langchain)',        col: 'backlog',  priority: 'high',   assignee: 'Dev',      project: 'HostPro',       notes: 'Kernfeature für Demo' },
-  { id: 't6',  title: 'Guesty OAuth Token-Management aufsetzen',                     col: 'done',     priority: 'high',   assignee: 'Pipeline', project: 'HostPro',       notes: 'Pro-Rata Revenue Berechnung' },
-  { id: 't7',  title: 'Pitch Script für Gastgebertag Vortrag schreiben',             col: 'backlog',  priority: 'high',   assignee: 'Quill',    project: 'HostPro',       notes: '30-Min Vortrag vor ~100 Gastgebern' },
-  { id: 't8',  title: 'Guesty API Deep Dive + Booking.com Kommissions-Logik',        col: 'done',     priority: 'high',   assignee: 'Pipeline', project: 'HostPro',       notes: 'hostPayout Airbnb=netto, Booking=brutto' },
-  { id: 't9',  title: 'Database Schema erstellen (Supabase)',                         col: 'done',     priority: 'high',   assignee: 'Dev',      project: 'HostPro',       notes: '' },
-  { id: 't10', title: 'Live-Demo vorbereiten (Beta-Signup Flow)',                     col: 'backlog',  priority: 'high',   assignee: 'Leon',     project: 'HostPro',       notes: 'Ziel: 20+ Signups am Event' },
-  { id: 't11', title: 'Kleinanzeigen Automation Pipeline bauen',                      col: 'backlog',  priority: 'medium', assignee: 'Dealer',   project: 'Kleinanzeigen', notes: '' },
-  { id: 't12', title: 'Belegungsraten-Berechnung implementieren',                     col: 'progress', priority: 'medium', assignee: 'Dev',      project: 'HostPro',       notes: 'gebuchte Nächte / Tage im Monat' },
-  { id: 't13', title: 'Morgenroutine Tracking-System einrichten',                     col: 'done',     priority: 'low',    assignee: 'Bob',      project: 'Personal',      notes: '7:00 aufstehen, Bibellesen, Frühstück' },
-  { id: 't14', title: 'Fitness Coach Daily Check-in Workflow',                         col: 'review',   priority: 'medium', assignee: 'Bob',      project: 'Personal',      notes: '21:30 Uhr täglich' },
-  { id: 't15', title: 'Pricing-Modell für HostPro definieren',                        col: 'backlog',  priority: 'medium', assignee: 'Leon',     project: 'HostPro',       notes: 'SaaS pricing: monthly/yearly' },
-  { id: 't16', title: 'Landing Page für HostPro erstellen',                           col: 'backlog',  priority: 'medium', assignee: 'Pixel',    project: 'HostPro',       notes: 'Beta-Signup Seite' },
-  { id: 't17', title: 'Social Media Post: Host Automation Teaser',                    col: 'backlog',  priority: 'low',    assignee: 'Quill',    project: 'Content',       notes: 'Discord sandiego.ctj' },
-  { id: 't18', title: 'Apartment Kosten-Input Interface bauen',                       col: 'backlog',  priority: 'high',   assignee: 'Dev',      project: 'HostPro',       notes: 'Kosten kommen NICHT aus Guesty → manueller Input' },
+  { id: 't1',  title: 'n8n Instanz starten + Guesty-Workflow importieren',            col: 'progress', priority: 'high',   assignee: 'Pipeline', project: 'HostPro', workspace: \'hostautomation\',       notes: 'n8n-workflows/guesty-sync-workflow.json' },
+  { id: 't2',  title: 'Supabase Projekt aufsetzen + Schema deployen',                col: 'progress', priority: 'high',   assignee: 'Dev',      project: 'HostPro', workspace: \'hostautomation\',       notes: 'supabase/schema.sql' },
+  { id: 't3',  title: 'Next.js Frontend an Supabase Views anbinden',                 col: 'progress', priority: 'high',   assignee: 'Dev',      project: 'HostPro', workspace: \'hostautomation\',       notes: '' },
+  { id: 't4',  title: 'v0 Dashboard-Mockup finalisieren (Dark Theme, KPIs)',         col: 'review',   priority: 'high',   assignee: 'Pixel',    project: 'HostPro', workspace: \'hostautomation\',       notes: 'HostPro - world-class SaaS Look' },
+  { id: 't5',  title: 'AI Chat Interface implementieren (GPT-4o + Langchain)',        col: 'backlog',  priority: 'high',   assignee: 'Dev',      project: 'HostPro', workspace: \'hostautomation\',       notes: 'Kernfeature für Demo' },
+  { id: 't6',  title: 'Guesty OAuth Token-Management aufsetzen',                     col: 'done',     priority: 'high',   assignee: 'Pipeline', project: 'HostPro', workspace: \'hostautomation\',       notes: 'Pro-Rata Revenue Berechnung' },
+  { id: 't7',  title: 'Pitch Script für Gastgebertag Vortrag schreiben',             col: 'backlog',  priority: 'high',   assignee: 'Quill',    project: 'HostPro', workspace: \'hostautomation\',       notes: '30-Min Vortrag vor ~100 Gastgebern' },
+  { id: 't8',  title: 'Guesty API Deep Dive + Booking.com Kommissions-Logik',        col: 'done',     priority: 'high',   assignee: 'Pipeline', project: 'HostPro', workspace: \'hostautomation\',       notes: 'hostPayout Airbnb=netto, Booking=brutto' },
+  { id: 't9',  title: 'Database Schema erstellen (Supabase)',                         col: 'done',     priority: 'high',   assignee: 'Dev',      project: 'HostPro', workspace: \'hostautomation\',       notes: '' },
+  { id: 't10', title: 'Live-Demo vorbereiten (Beta-Signup Flow)',                     col: 'backlog',  priority: 'high',   assignee: 'Leon',     project: 'HostPro', workspace: \'hostautomation\',       notes: 'Ziel: 20+ Signups am Event' },
+  { id: 't11', title: 'Kleinanzeigen Automation Pipeline bauen',                      col: 'backlog',  priority: 'medium', assignee: 'Dealer',   project: 'Kleinanzeigen', workspace: \'hostautomation\', notes: '' },
+  { id: 't12', title: 'Belegungsraten-Berechnung implementieren',                     col: 'progress', priority: 'medium', assignee: 'Dev',      project: 'HostPro', workspace: \'hostautomation\',       notes: 'gebuchte Nächte / Tage im Monat' },
+  { id: 't13', title: 'Morgenroutine Tracking-System einrichten',                     col: 'done',     priority: 'low',    assignee: 'Bob',      project: 'Personal', workspace: \'personal\',      notes: '7:00 aufstehen, Bibellesen, Frühstück' },
+  { id: 't14', title: 'Fitness Coach Daily Check-in Workflow',                         col: 'review',   priority: 'medium', assignee: 'Bob',      project: 'Personal', workspace: \'personal\',      notes: '21:30 Uhr täglich' },
+  { id: 't15', title: 'Pricing-Modell für HostPro definieren',                        col: 'backlog',  priority: 'medium', assignee: 'Leon',     project: 'HostPro', workspace: \'hostautomation\',       notes: 'SaaS pricing: monthly/yearly' },
+  { id: 't16', title: 'Landing Page für HostPro erstellen',                           col: 'backlog',  priority: 'medium', assignee: 'Pixel',    project: 'HostPro', workspace: \'hostautomation\',       notes: 'Beta-Signup Seite' },
+  { id: 't17', title: 'Social Media Post: Host Automation Teaser',                    col: 'backlog',  priority: 'low',    assignee: 'Quill',    project: 'Content', workspace: \'hostautomation\',       notes: 'Discord sandiego.ctj' },
+  { id: 't18', title: 'Apartment Kosten-Input Interface bauen',                       col: 'backlog',  priority: 'high',   assignee: 'Dev',      project: 'HostPro', workspace: \'hostautomation\',       notes: 'Kosten kommen NICHT aus Guesty → manueller Input' },
+,
+
+  /* ── ELA APARTMENTS ── */
+  { id: 'e1',  title: 'Reinigungsplan KW9 erstellen',                                col: 'progress', priority: 'high',   assignee: 'Leon',     project: 'ELA',      workspace: 'ela', notes: 'Alle 26 Apartments koordinieren' },
+  { id: 'e2',  title: 'Bewertungen beantworten (Airbnb + Booking)',                  col: 'backlog',  priority: 'high',   assignee: 'Bob',      project: 'ELA',      workspace: 'ela', notes: '' },
+  { id: 'e3',  title: 'Maintenance-Check Apartment #12',                              col: 'progress', priority: 'high',   assignee: 'Leon',     project: 'ELA',      workspace: 'ela', notes: '' },
+  { id: 'e4',  title: 'Neue Fotos für Listing #5',                                   col: 'backlog',  priority: 'medium', assignee: 'Leon',     project: 'ELA',      workspace: 'ela', notes: '' },
+  { id: 'e5',  title: 'Bettwäsche nachbestellen',                                    col: 'backlog',  priority: 'medium', assignee: 'Leon',     project: 'ELA',      workspace: 'ela', notes: '' },
+  { id: 'e6',  title: 'Check-in Automation optimieren',                               col: 'review',   priority: 'high',   assignee: 'Bob',      project: 'ELA',      workspace: 'ela', notes: '' },
+  /* ── PERSONAL ── */
+  { id: 'p1',  title: 'Morgenroutine beibehalten',                                   col: 'progress', priority: 'high',   assignee: 'Leon',     project: 'Personal', workspace: 'personal', notes: '' },
+  { id: 'p2',  title: 'Trainingsplan Woche 9 optimieren',                             col: 'backlog',  priority: 'medium', assignee: 'Leon',     project: 'Personal', workspace: 'personal', notes: '' },
+  { id: 'p3',  title: 'Meal Prep Sonntag planen',                                    col: 'backlog',  priority: 'medium', assignee: 'Leon',     project: 'Personal', workspace: 'personal', notes: '' },
+  { id: 'p4',  title: 'Gym-Abo verlängern',                                          col: 'backlog',  priority: 'low',    assignee: 'Leon',     project: 'Personal', workspace: 'personal', notes: '' },
+
 ];
 
 /* ─── CONTENT PIPELINE ─── */
@@ -1597,61 +1840,61 @@ let contentItems = JSON.parse(localStorage.getItem('mc-content') || 'null') || [
 /* ─── MEMORY ENTRIES ─── */
 const memoryEntries = [
   {
-    id: 'm1', date: '23. Feb 2026', cat: 'projects', color: 'cyan', icon: '🚀',
+    id: 'm1', date: '23. Feb 2026', cat: 'projects', workspace: 'hostautomation', workspace: 'hostautomation', color: 'cyan', icon: '🚀',
     title: 'Guesty API Deep Dive + n8n Workflow',
     body: 'Airbnb: hostPayout = netto (Kommission schon abgezogen). Booking.com: hostPayout = BRUTTO → minus channelCommission minus 1.4% Payment Fee. Kosten kommen NICHT aus Guesty → manueller User-Input im Dashboard. Belegung: selbst berechnen aus Reservierungen (gebuchte Nächte / Tage im Monat).',
     tags: ['Guesty', 'n8n', 'Supabase', 'HostPro']
   },
   {
-    id: 'm2', date: '23. Feb 2026', cat: 'projects', color: 'emerald', icon: '🏗️',
+    id: 'm2', date: '23. Feb 2026', cat: 'projects', workspace: 'hostautomation', workspace: 'hostautomation', color: 'emerald', icon: '🏗️',
     title: 'HostPro MVP Tech Stack finalisiert',
     body: 'n8n (Guesty Sync), Supabase (DB), Next.js + Shadcn/UI, OpenAI GPT-4o + Langchain. Schema erstellt, Pipeline gebaut, Frontend in Arbeit. v0 (Vercel) für UI Mockups.',
     tags: ['Next.js', 'Shadcn/UI', 'GPT-4o', 'Langchain']
   },
   {
-    id: 'm3', date: '19. Feb 2026', cat: 'projects', color: 'purple', icon: '🎯',
+    id: 'm3', date: '19. Feb 2026', cat: 'projects', workspace: 'hostautomation', workspace: 'hostautomation', color: 'purple', icon: '🎯',
     title: 'Host Automation Dashboard MVP Planung',
     body: 'Problem validiert durch Hendrik Kuhlmann + Jonas (180 Apartments). Deadline: 7. März 2026 Gastgebertag Präsentation. Ziel: 20+ Beta-Signups. Live-Demo = Killer-Feature.',
     tags: ['MVP', 'Validierung', 'Deadline', 'Demo']
   },
   {
-    id: 'm4', date: '23. Feb 2026', cat: 'personal', color: 'amber', icon: '🌅',
+    id: 'm4', date: '23. Feb 2026', cat: 'personal', workspace: 'personal', color: 'amber', icon: '🌅',
     title: 'Lifestyle Transformation gestartet',
     body: 'Morgenroutine: 7:00 Uhr aufstehen (KEIN SNOOZE!), 7:05 Bibellesen (15-20 Min), 7:25 Frühstück. Training: Mo/Mi/Fr Kampftraining, Di/Sa Gym, Do/So Rest. Fitness Coach: Daily Check-in 21:30 Uhr.',
     tags: ['Routine', 'Training', 'Bibellesen', 'Gesundheit']
   },
   {
-    id: 'm5', date: '18. Feb 2026', cat: 'business', color: 'cyan', icon: '💼',
+    id: 'm5', date: '18. Feb 2026', cat: 'business', workspace: 'hostautomation', color: 'cyan', icon: '💼',
     title: 'Kontakte & Business Insights',
     body: 'Hendrik Kuhlmann: Partner, Event-Host, sagt "Würde ich selbst so machen". Jonas: 180 Apartments, Beta-User, Case Study. Leon selbst: 26 Apartments, 4h/Monat manuelle Kalkulation.',
     tags: ['Hendrik', 'Jonas', 'Partnership', 'Airbnb']
   },
   {
-    id: 'm6', date: '18. Feb 2026', cat: 'business', color: 'emerald', icon: '💰',
+    id: 'm6', date: '18. Feb 2026', cat: 'business', workspace: 'hostautomation', color: 'emerald', icon: '💰',
     title: 'Business Insights: Airbnb Pain Points',
     body: 'PMS zeigt nur Umsatz, keine Kosten. Bei 50+ Apartments: Kontrollverlust. Zielgruppe: 2-20 Apartments (Hauptzielgruppe bei Hendrik). Event-Präsentation = warme Leads.',
     tags: ['PMS', 'Pain Points', 'Target Audience', 'Leads']
   },
   {
-    id: 'm7', date: '18. Feb 2026', cat: 'tech', color: 'purple', icon: '🔑',
+    id: 'm7', date: '18. Feb 2026', cat: 'tech', workspace: 'hostautomation', color: 'purple', icon: '🔑',
     title: 'Tech Stack & Credentials eingerichtet',
     body: 'Google Account: claw58495@gmail.com. n8n API Key + Instance. GitHub Personal Access Token. OpenRouter für Web Search. Supabase Anon Key + Service Role Key.',
     tags: ['Credentials', 'n8n', 'GitHub', 'Supabase']
   },
   {
-    id: 'm8', date: '23. Feb 2026', cat: 'lessons', color: 'amber', icon: '💡',
+    id: 'm8', date: '23. Feb 2026', cat: 'lessons', workspace: 'hostautomation', color: 'amber', icon: '💡',
     title: 'Lessons Learned: Product Development',
     body: 'Validation is key: Hendrik + Jonas bestätigen = GO! Live Demo > Slides: Bei Gastgebertag = mehr Impact. MVP-First: 16 Tage = nur Core-Features, kein Fancy-Design.',
     tags: ['Validation', 'MVP', 'Demo', 'Strategy']
   },
   {
-    id: 'm9', date: '19. Feb 2026', cat: 'tech', color: 'cyan', icon: '⚙️',
+    id: 'm9', date: '19. Feb 2026', cat: 'tech', workspace: 'hostautomation', color: 'cyan', icon: '⚙️',
     title: 'n8n Workflow: Guesty → Supabase Pipeline',
     body: 'Workflow importiert: guesty-sync-workflow.json. OAuth 2.0 Token Management. Pro-Rata Revenue Berechnung. Kommissions-Logik pro Channel (Airbnb vs Booking.com).',
     tags: ['n8n', 'ETL', 'OAuth', 'Pipeline']
   },
   {
-    id: 'm10', date: '18. Feb 2026', cat: 'projects', color: 'purple', icon: '📱',
+    id: 'm10', date: '18. Feb 2026', cat: 'projects', workspace: 'hostautomation', workspace: 'hostautomation', color: 'purple', icon: '📱',
     title: 'Google Play Store App Upload',
     body: 'Leon hat Google Play Developer Account (verifiziert). App bereits im Store eingereicht. Nächste Schritte besprochen.',
     tags: ['Google Play', 'App', 'Mobile']
@@ -1663,51 +1906,51 @@ const calEvents = [
   // Week of 23-Mar 2026 → show current week relative to TODAY (26 Feb)
   // Days: Mon=0, Tue=1, Wed=2, Thu=3, Fri=4, Sat=5, Sun=6
   // time in hours (decimal)
-  { title: '🌅 Aufstehen',             day: 0, start: 7.0,  end: 7.1,  type: 'routine',  repeat: true },
-  { title: '📖 Bibellesen',             day: 0, start: 7.1,  end: 7.4,  type: 'routine',  repeat: true },
-  { title: '🍳 Frühstück',              day: 0, start: 7.4,  end: 7.8,  type: 'routine',  repeat: true },
+  { title: '🌅 Aufstehen',             day: 0, start: 7.0,  end: 7.1,  type: 'routine',  repeat: true, workspace: 'personal' },
+  { title: '📖 Bibellesen',             day: 0, start: 7.1,  end: 7.4,  type: 'routine',  repeat: true, workspace: 'personal' },
+  { title: '🍳 Frühstück',              day: 0, start: 7.4,  end: 7.8,  type: 'routine',  repeat: true, workspace: 'personal' },
   { title: '💻 Deep Work: HostPro',     day: 0, start: 8.0,  end: 12.0, type: 'work' },
   { title: '🍽️ Mittagessen (Mama)',     day: 0, start: 12.0, end: 13.0, type: 'personal' },
   { title: '💻 HostPro Frontend',       day: 0, start: 13.0, end: 17.0, type: 'work' },
   { title: '🥊 Kampftraining',          day: 0, start: 18.0, end: 19.5, type: 'personal' },
   { title: '💪 Check-in Coach',         day: 0, start: 21.5, end: 22.0, type: 'routine' },
   
-  { title: '🌅 Aufstehen',             day: 1, start: 7.0,  end: 7.1,  type: 'routine',  repeat: true },
-  { title: '💻 n8n Workflow Setup',    day: 1, start: 8.0,  end: 12.0, type: 'work' },
-  { title: '🍽️ Mittagessen (Mama)',    day: 1, start: 12.0, end: 13.0, type: 'personal' },
-  { title: '🔄 Guesty Sync testen',    day: 1, start: 13.0, end: 15.0, type: 'work' },
-  { title: '🏋️ Gym',                   day: 1, start: 17.0, end: 18.5, type: 'personal' },
-  { title: '💪 Check-in Coach',        day: 1, start: 21.5, end: 22.0, type: 'routine' },
+  { title: '🌅 Aufstehen',             day: 1, start: 7.0,  end: 7.1,  type: 'routine',  repeat: true, workspace: 'personal' },
+  { title: '💻 n8n Workflow Setup',    day: 1, start: 8.0,  end: 12.0, type: 'work', workspace: 'hostautomation' },
+  { title: '🍽️ Mittagessen (Mama)',    day: 1, start: 12.0, end: 13.0, type: 'personal', workspace: 'hostautomation' },
+  { title: '🔄 Guesty Sync testen',    day: 1, start: 13.0, end: 15.0, type: 'work', workspace: 'hostautomation' },
+  { title: '🏋️ Gym',                   day: 1, start: 17.0, end: 18.5, type: 'personal', workspace: 'hostautomation' },
+  { title: '💪 Check-in Coach',        day: 1, start: 21.5, end: 22.0, type: 'routine', workspace: 'hostautomation' },
   
-  { title: '🌅 Aufstehen',             day: 2, start: 7.0,  end: 7.1,  type: 'routine' },
-  { title: '💻 Supabase Schema',       day: 2, start: 8.0,  end: 12.0, type: 'work' },
-  { title: '🍽️ Mittagessen (Mama)',    day: 2, start: 12.0, end: 13.0, type: 'personal' },
-  { title: '🎨 v0 Dashboard Mockup',   day: 2, start: 13.0, end: 16.0, type: 'work' },
-  { title: '🥊 Kampftraining',         day: 2, start: 18.0, end: 19.5, type: 'personal' },
-  { title: '💪 Check-in Coach',        day: 2, start: 21.5, end: 22.0, type: 'routine' },
+  { title: '🌅 Aufstehen',             day: 2, start: 7.0,  end: 7.1,  type: 'routine', workspace: 'hostautomation' },
+  { title: '💻 Supabase Schema',       day: 2, start: 8.0,  end: 12.0, type: 'work', workspace: 'hostautomation' },
+  { title: '🍽️ Mittagessen (Mama)',    day: 2, start: 12.0, end: 13.0, type: 'personal', workspace: 'hostautomation' },
+  { title: '🎨 v0 Dashboard Mockup',   day: 2, start: 13.0, end: 16.0, type: 'work', workspace: 'hostautomation' },
+  { title: '🥊 Kampftraining',         day: 2, start: 18.0, end: 19.5, type: 'personal', workspace: 'hostautomation' },
+  { title: '💪 Check-in Coach',        day: 2, start: 21.5, end: 22.0, type: 'routine', workspace: 'hostautomation' },
   
-  { title: '🌅 Aufstehen',             day: 3, start: 7.0,  end: 7.1,  type: 'routine' },
-  { title: '💻 Next.js Frontend',      day: 3, start: 8.0,  end: 12.0, type: 'work' },
-  { title: '🍽️ Mittagessen (Mama)',    day: 3, start: 12.0, end: 13.0, type: 'personal' },
-  { title: '⚙️ Cron: Daily Standup',   day: 3, start: 9.0,  end: 9.5,  type: 'cron' },
-  { title: '💻 AI Chat Interface',     day: 3, start: 13.0, end: 17.0, type: 'work' },
-  { title: '😴 Rest Day',              day: 3, start: 18.0, end: 19.0, type: 'personal' },
-  { title: '💪 Check-in Coach',        day: 3, start: 21.5, end: 22.0, type: 'routine' },
+  { title: '🌅 Aufstehen',             day: 3, start: 7.0,  end: 7.1,  type: 'routine', workspace: 'hostautomation' },
+  { title: '💻 Next.js Frontend',      day: 3, start: 8.0,  end: 12.0, type: 'work', workspace: 'hostautomation' },
+  { title: '🍽️ Mittagessen (Mama)',    day: 3, start: 12.0, end: 13.0, type: 'personal', workspace: 'hostautomation' },
+  { title: '⚙️ Cron: Daily Standup',   day: 3, start: 9.0,  end: 9.5,  type: 'cron', workspace: 'hostautomation' },
+  { title: '💻 AI Chat Interface',     day: 3, start: 13.0, end: 17.0, type: 'work', workspace: 'hostautomation' },
+  { title: '😴 Rest Day',              day: 3, start: 18.0, end: 19.0, type: 'personal', workspace: 'hostautomation' },
+  { title: '💪 Check-in Coach',        day: 3, start: 21.5, end: 22.0, type: 'routine', workspace: 'hostautomation' },
   
-  { title: '🌅 Aufstehen',             day: 4, start: 7.0,  end: 7.1,  type: 'routine' },
-  { title: '💻 Live Demo Prep',        day: 4, start: 8.0,  end: 12.0, type: 'work' },
-  { title: '🍽️ Mittagessen (Mama)',    day: 4, start: 12.0, end: 13.0, type: 'personal' },
-  { title: '⚙️ Cron: Kalorien-Track', day: 4, start: 12.5, end: 13.0, type: 'cron' },
-  { title: '🥊 Kampftraining',         day: 4, start: 18.0, end: 19.5, type: 'personal' },
-  { title: '💪 Check-in Coach',        day: 4, start: 21.5, end: 22.0, type: 'routine' },
+  { title: '🌅 Aufstehen',             day: 4, start: 7.0,  end: 7.1,  type: 'routine', workspace: 'hostautomation' },
+  { title: '💻 Live Demo Prep',        day: 4, start: 8.0,  end: 12.0, type: 'work', workspace: 'hostautomation' },
+  { title: '🍽️ Mittagessen (Mama)',    day: 4, start: 12.0, end: 13.0, type: 'personal', workspace: 'hostautomation' },
+  { title: '⚙️ Cron: Kalorien-Track', day: 4, start: 12.5, end: 13.0, type: 'cron', workspace: 'hostautomation' },
+  { title: '🥊 Kampftraining',         day: 4, start: 18.0, end: 19.5, type: 'personal', workspace: 'hostautomation' },
+  { title: '💪 Check-in Coach',        day: 4, start: 21.5, end: 22.0, type: 'routine', workspace: 'hostautomation' },
   
-  { title: '🏋️ Gym',                   day: 5, start: 9.0,  end: 10.5, type: 'personal' },
-  { title: '💻 HostPro Review',        day: 5, start: 11.0, end: 14.0, type: 'work' },
-  { title: '⚙️ Cron: Meal Prep',       day: 5, start: 15.0, end: 17.0, type: 'cron' },
+  { title: '🏋️ Gym',                   day: 5, start: 9.0,  end: 10.5, type: 'personal', workspace: 'hostautomation' },
+  { title: '💻 HostPro Review',        day: 5, start: 11.0, end: 14.0, type: 'work', workspace: 'hostautomation' },
+  { title: '⚙️ Cron: Meal Prep',       day: 5, start: 15.0, end: 17.0, type: 'cron', workspace: 'hostautomation' },
   
-  { title: '⛪ Kirche / Bibellesen',   day: 6, start: 10.0, end: 12.0, type: 'personal' },
-  { title: '⚙️ Cron: Meal Prep',       day: 6, start: 15.0, end: 17.0, type: 'cron' },
-  { title: '🗂️ Weekly Review',         day: 6, start: 17.0, end: 18.0, type: 'work' },
+  { title: '⛪ Kirche / Bibellesen',   day: 6, start: 10.0, end: 12.0, type: 'personal', workspace: 'hostautomation' },
+  { title: '⚙️ Cron: Meal Prep',       day: 6, start: 15.0, end: 17.0, type: 'cron', workspace: 'hostautomation' },
+  { title: '🗂️ Weekly Review',         day: 6, start: 17.0, end: 18.0, type: 'work', workspace: 'hostautomation' },
 ];
 
 /* ─── UPCOMING EVENTS ─── */
@@ -1870,12 +2113,12 @@ function renderTasks() {
   const filterP  = document.getElementById('filter-priority')?.value || '';
 
   let filtered = tasks.filter(t => {
+    const inWorkspace = !t.workspace || t.workspace === activeWorkspace;
     const matchSearch = !search || t.title.toLowerCase().includes(search) || (t.project||'').toLowerCase().includes(search);
     const matchA = !filterA || t.assignee === filterA;
     const matchP = !filterP || t.priority === filterP;
-    return matchSearch && matchA && matchP;
+    return inWorkspace && matchSearch && matchA && matchP;
   });
-
   cols.forEach(col => {
     const zone = document.getElementById('col-' + col);
     if (!zone) return;
@@ -2001,7 +2244,7 @@ function renderContent() {
 
   board.innerHTML = stageOrder.map(stage => {
     const cfg   = stageConfig[stage];
-    const items = contentItems.filter(c => c.stage === stage);
+    const items = contentItems.filter(c => c.stage === stage && (!c.workspace || c.workspace === activeWorkspace));
     return `
       <div class="pipeline-stage">
         <div class="pipeline-stage-header ${cfg.cls}">
@@ -2052,7 +2295,7 @@ function renderMemory(search='') {
   const timeline = document.getElementById('memory-timeline');
   if (!timeline) return;
 
-  let items = memoryEntries;
+  let items = memoryEntries.filter(m => !m.workspace || m.workspace === activeWorkspace);
   if (activeCat !== 'all') items = items.filter(m => m.cat === activeCat);
   if (search) items = items.filter(m =>
     m.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -2172,7 +2415,7 @@ function renderCalendar() {
     });
 
     // Events for this day
-    const dayEvents = calEvents.filter(e => e.day === d);
+    const dayEvents = calEvents.filter(e => e.day === d && (!e.workspace || e.workspace === activeWorkspace || e.workspace === 'personal'));
     dayEvents.forEach(ev => {
       const topPx  = (ev.start - startH) * slotH;
       const height = Math.max((ev.end - ev.start) * slotH - 2, 18);
@@ -2379,6 +2622,9 @@ function init() {
   navigate('dashboard');
 }
 
+
+// Initialize workspace UI on load
+updateWorkspaceUI();
 init();
 
 </script>
