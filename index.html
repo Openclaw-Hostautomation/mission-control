@@ -320,8 +320,10 @@ body {
   border-radius: 999px; border: 1px solid transparent;
   cursor: default;
 }
-.header-pill.red   { background: var(--red-dim);     border-color: rgba(255,82,82,.2);     color: var(--red); }
-.header-pill.green { background: var(--emerald-dim);  border-color: rgba(0,230,118,.2);      color: var(--emerald); }
+.header-pill.red    { background: var(--red-dim);     border-color: rgba(255,82,82,.2);     color: var(--red); }
+.header-pill.green  { background: var(--emerald-dim);  border-color: rgba(0,230,118,.2);      color: var(--emerald); }
+.header-pill.purple { background: var(--purple-dim);   border-color: rgba(162,155,254,.2);    color: var(--purple); }
+.header-pill.purple:hover { background: rgba(162,155,254,.25); border-color: rgba(162,155,254,.35); }
 .countdown-pill {
   display: flex; align-items: center; gap: 6px;
   font-size: 12px; font-weight: 700; color: var(--amber);
@@ -1289,6 +1291,9 @@ body {
       <div class="header-pill green">
         <span>●</span> 3 Agents Online
       </div>
+      <a href="https://console.anthropic.com/settings/billing" target="_blank" class="header-pill purple" style="text-decoration:none;cursor:pointer;">
+        <span>⬡</span> API Billing
+      </a>
       <div class="header-clock" id="header-clock">00:00:00</div>
     </header>
 
