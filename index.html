@@ -116,7 +116,8 @@ body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   z-index: 100;
-  
+  overflow: hidden;
+}
 
 /* Workspace tint on sidebar */
 .sidebar::after {
@@ -128,8 +129,6 @@ body {
   opacity: .9;
   transition: background .4s;
   pointer-events: none;
-}
-overflow: hidden;
 }
 
 .sidebar-logo {
@@ -150,7 +149,10 @@ overflow: hidden;
 .sidebar-logo-text { font-weight: 800; font-size: 15px; color: #fff; letter-spacing: -.02em; }
 .sidebar-logo-text span { color: var(--cyan); }
 
-.sidebar-section-
+.sidebar-section-label {
+  font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-faint); padding: 16px 20px 6px; display: block;
+}
 
 /* ══════════════════════════════════════════
    WORKSPACE SWITCHER
@@ -222,11 +224,6 @@ overflow: hidden;
 .ws-swatch { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .ws-dropdown-divider { height: 1px; background: var(--border); margin: 4px 6px; }
 
-
-label {
-  font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--text-faint); padding: 16px 20px 6px;
-}
 
 .sidebar-nav { flex: 1; overflow-y: auto; padding: 8px 10px; }
 
@@ -1789,25 +1786,24 @@ document.addEventListener('click', function(e) {
 
 /* ─── TASKS ─── */
 let tasks = JSON.parse(localStorage.getItem('mc-tasks') || 'null') || [
-  { id: 't1',  title: 'n8n Instanz starten + Guesty-Workflow importieren',            col: 'progress', priority: 'high',   assignee: 'Pipeline', project: 'HostPro', workspace: \'hostautomation\',       notes: 'n8n-workflows/guesty-sync-workflow.json' },
-  { id: 't2',  title: 'Supabase Projekt aufsetzen + Schema deployen',                col: 'progress', priority: 'high',   assignee: 'Dev',      project: 'HostPro', workspace: \'hostautomation\',       notes: 'supabase/schema.sql' },
-  { id: 't3',  title: 'Next.js Frontend an Supabase Views anbinden',                 col: 'progress', priority: 'high',   assignee: 'Dev',      project: 'HostPro', workspace: \'hostautomation\',       notes: '' },
-  { id: 't4',  title: 'v0 Dashboard-Mockup finalisieren (Dark Theme, KPIs)',         col: 'review',   priority: 'high',   assignee: 'Pixel',    project: 'HostPro', workspace: \'hostautomation\',       notes: 'HostPro - world-class SaaS Look' },
-  { id: 't5',  title: 'AI Chat Interface implementieren (GPT-4o + Langchain)',        col: 'backlog',  priority: 'high',   assignee: 'Dev',      project: 'HostPro', workspace: \'hostautomation\',       notes: 'Kernfeature für Demo' },
-  { id: 't6',  title: 'Guesty OAuth Token-Management aufsetzen',                     col: 'done',     priority: 'high',   assignee: 'Pipeline', project: 'HostPro', workspace: \'hostautomation\',       notes: 'Pro-Rata Revenue Berechnung' },
-  { id: 't7',  title: 'Pitch Script für Gastgebertag Vortrag schreiben',             col: 'backlog',  priority: 'high',   assignee: 'Quill',    project: 'HostPro', workspace: \'hostautomation\',       notes: '30-Min Vortrag vor ~100 Gastgebern' },
-  { id: 't8',  title: 'Guesty API Deep Dive + Booking.com Kommissions-Logik',        col: 'done',     priority: 'high',   assignee: 'Pipeline', project: 'HostPro', workspace: \'hostautomation\',       notes: 'hostPayout Airbnb=netto, Booking=brutto' },
-  { id: 't9',  title: 'Database Schema erstellen (Supabase)',                         col: 'done',     priority: 'high',   assignee: 'Dev',      project: 'HostPro', workspace: \'hostautomation\',       notes: '' },
-  { id: 't10', title: 'Live-Demo vorbereiten (Beta-Signup Flow)',                     col: 'backlog',  priority: 'high',   assignee: 'Leon',     project: 'HostPro', workspace: \'hostautomation\',       notes: 'Ziel: 20+ Signups am Event' },
-  { id: 't11', title: 'Kleinanzeigen Automation Pipeline bauen',                      col: 'backlog',  priority: 'medium', assignee: 'Dealer',   project: 'Kleinanzeigen', workspace: \'hostautomation\', notes: '' },
-  { id: 't12', title: 'Belegungsraten-Berechnung implementieren',                     col: 'progress', priority: 'medium', assignee: 'Dev',      project: 'HostPro', workspace: \'hostautomation\',       notes: 'gebuchte Nächte / Tage im Monat' },
-  { id: 't13', title: 'Morgenroutine Tracking-System einrichten',                     col: 'done',     priority: 'low',    assignee: 'Bob',      project: 'Personal', workspace: \'personal\',      notes: '7:00 aufstehen, Bibellesen, Frühstück' },
-  { id: 't14', title: 'Fitness Coach Daily Check-in Workflow',                         col: 'review',   priority: 'medium', assignee: 'Bob',      project: 'Personal', workspace: \'personal\',      notes: '21:30 Uhr täglich' },
-  { id: 't15', title: 'Pricing-Modell für HostPro definieren',                        col: 'backlog',  priority: 'medium', assignee: 'Leon',     project: 'HostPro', workspace: \'hostautomation\',       notes: 'SaaS pricing: monthly/yearly' },
-  { id: 't16', title: 'Landing Page für HostPro erstellen',                           col: 'backlog',  priority: 'medium', assignee: 'Pixel',    project: 'HostPro', workspace: \'hostautomation\',       notes: 'Beta-Signup Seite' },
-  { id: 't17', title: 'Social Media Post: Host Automation Teaser',                    col: 'backlog',  priority: 'low',    assignee: 'Quill',    project: 'Content', workspace: \'hostautomation\',       notes: 'Discord sandiego.ctj' },
-  { id: 't18', title: 'Apartment Kosten-Input Interface bauen',                       col: 'backlog',  priority: 'high',   assignee: 'Dev',      project: 'HostPro', workspace: \'hostautomation\',       notes: 'Kosten kommen NICHT aus Guesty → manueller Input' },
-,
+  { id: 't1',  title: 'n8n Instanz starten + Guesty-Workflow importieren',            col: 'progress', priority: 'high',   assignee: 'Pipeline', project: 'HostPro', workspace: 'hostautomation',       notes: 'n8n-workflows/guesty-sync-workflow.json' },
+  { id: 't2',  title: 'Supabase Projekt aufsetzen + Schema deployen',                col: 'progress', priority: 'high',   assignee: 'Dev',      project: 'HostPro', workspace: 'hostautomation',       notes: 'supabase/schema.sql' },
+  { id: 't3',  title: 'Next.js Frontend an Supabase Views anbinden',                 col: 'progress', priority: 'high',   assignee: 'Dev',      project: 'HostPro', workspace: 'hostautomation',       notes: '' },
+  { id: 't4',  title: 'v0 Dashboard-Mockup finalisieren (Dark Theme, KPIs)',         col: 'review',   priority: 'high',   assignee: 'Pixel',    project: 'HostPro', workspace: 'hostautomation',       notes: 'HostPro - world-class SaaS Look' },
+  { id: 't5',  title: 'AI Chat Interface implementieren (GPT-4o + Langchain)',        col: 'backlog',  priority: 'high',   assignee: 'Dev',      project: 'HostPro', workspace: 'hostautomation',       notes: 'Kernfeature für Demo' },
+  { id: 't6',  title: 'Guesty OAuth Token-Management aufsetzen',                     col: 'done',     priority: 'high',   assignee: 'Pipeline', project: 'HostPro', workspace: 'hostautomation',       notes: 'Pro-Rata Revenue Berechnung' },
+  { id: 't7',  title: 'Pitch Script für Gastgebertag Vortrag schreiben',             col: 'backlog',  priority: 'high',   assignee: 'Quill',    project: 'HostPro', workspace: 'hostautomation',       notes: '30-Min Vortrag vor ~100 Gastgebern' },
+  { id: 't8',  title: 'Guesty API Deep Dive + Booking.com Kommissions-Logik',        col: 'done',     priority: 'high',   assignee: 'Pipeline', project: 'HostPro', workspace: 'hostautomation',       notes: 'hostPayout Airbnb=netto, Booking=brutto' },
+  { id: 't9',  title: 'Database Schema erstellen (Supabase)',                         col: 'done',     priority: 'high',   assignee: 'Dev',      project: 'HostPro', workspace: 'hostautomation',       notes: '' },
+  { id: 't10', title: 'Live-Demo vorbereiten (Beta-Signup Flow)',                     col: 'backlog',  priority: 'high',   assignee: 'Leon',     project: 'HostPro', workspace: 'hostautomation',       notes: 'Ziel: 20+ Signups am Event' },
+  { id: 't11', title: 'Kleinanzeigen Automation Pipeline bauen',                      col: 'backlog',  priority: 'medium', assignee: 'Dealer',   project: 'Kleinanzeigen', workspace: 'hostautomation', notes: '' },
+  { id: 't12', title: 'Belegungsraten-Berechnung implementieren',                     col: 'progress', priority: 'medium', assignee: 'Dev',      project: 'HostPro', workspace: 'hostautomation',       notes: 'gebuchte Nächte / Tage im Monat' },
+  { id: 't13', title: 'Morgenroutine Tracking-System einrichten',                     col: 'done',     priority: 'low',    assignee: 'Bob',      project: 'Personal', workspace: 'personal',      notes: '7:00 aufstehen, Bibellesen, Frühstück' },
+  { id: 't14', title: 'Fitness Coach Daily Check-in Workflow',                         col: 'review',   priority: 'medium', assignee: 'Bob',      project: 'Personal', workspace: 'personal',      notes: '21:30 Uhr täglich' },
+  { id: 't15', title: 'Pricing-Modell für HostPro definieren',                        col: 'backlog',  priority: 'medium', assignee: 'Leon',     project: 'HostPro', workspace: 'hostautomation',       notes: 'SaaS pricing: monthly/yearly' },
+  { id: 't16', title: 'Landing Page für HostPro erstellen',                           col: 'backlog',  priority: 'medium', assignee: 'Pixel',    project: 'HostPro', workspace: 'hostautomation',       notes: 'Beta-Signup Seite' },
+  { id: 't17', title: 'Social Media Post: Host Automation Teaser',                    col: 'backlog',  priority: 'low',    assignee: 'Quill',    project: 'Content', workspace: 'hostautomation',       notes: 'Discord sandiego.ctj' },
+  { id: 't18', title: 'Apartment Kosten-Input Interface bauen',                       col: 'backlog',  priority: 'high',   assignee: 'Dev',      project: 'HostPro', workspace: 'hostautomation',       notes: 'Kosten kommen NICHT aus Guesty → manueller Input' },
 
   /* ── ELA APARTMENTS ── */
   { id: 'e1',  title: 'Reinigungsplan KW9 erstellen',                                col: 'progress', priority: 'high',   assignee: 'Leon',     project: 'ELA',      workspace: 'ela', notes: 'Alle 26 Apartments koordinieren' },
@@ -1840,19 +1836,19 @@ let contentItems = JSON.parse(localStorage.getItem('mc-content') || 'null') || [
 /* ─── MEMORY ENTRIES ─── */
 const memoryEntries = [
   {
-    id: 'm1', date: '23. Feb 2026', cat: 'projects', workspace: 'hostautomation', workspace: 'hostautomation', color: 'cyan', icon: '🚀',
+    id: 'm1', date: '23. Feb 2026', cat: 'projects', workspace: 'hostautomation', color: 'cyan', icon: '🚀',
     title: 'Guesty API Deep Dive + n8n Workflow',
     body: 'Airbnb: hostPayout = netto (Kommission schon abgezogen). Booking.com: hostPayout = BRUTTO → minus channelCommission minus 1.4% Payment Fee. Kosten kommen NICHT aus Guesty → manueller User-Input im Dashboard. Belegung: selbst berechnen aus Reservierungen (gebuchte Nächte / Tage im Monat).',
     tags: ['Guesty', 'n8n', 'Supabase', 'HostPro']
   },
   {
-    id: 'm2', date: '23. Feb 2026', cat: 'projects', workspace: 'hostautomation', workspace: 'hostautomation', color: 'emerald', icon: '🏗️',
+    id: 'm2', date: '23. Feb 2026', cat: 'projects', workspace: 'hostautomation', color: 'emerald', icon: '🏗️',
     title: 'HostPro MVP Tech Stack finalisiert',
     body: 'n8n (Guesty Sync), Supabase (DB), Next.js + Shadcn/UI, OpenAI GPT-4o + Langchain. Schema erstellt, Pipeline gebaut, Frontend in Arbeit. v0 (Vercel) für UI Mockups.',
     tags: ['Next.js', 'Shadcn/UI', 'GPT-4o', 'Langchain']
   },
   {
-    id: 'm3', date: '19. Feb 2026', cat: 'projects', workspace: 'hostautomation', workspace: 'hostautomation', color: 'purple', icon: '🎯',
+    id: 'm3', date: '19. Feb 2026', cat: 'projects', workspace: 'hostautomation', color: 'purple', icon: '🎯',
     title: 'Host Automation Dashboard MVP Planung',
     body: 'Problem validiert durch Hendrik Kuhlmann + Jonas (180 Apartments). Deadline: 7. März 2026 Gastgebertag Präsentation. Ziel: 20+ Beta-Signups. Live-Demo = Killer-Feature.',
     tags: ['MVP', 'Validierung', 'Deadline', 'Demo']
@@ -1894,7 +1890,7 @@ const memoryEntries = [
     tags: ['n8n', 'ETL', 'OAuth', 'Pipeline']
   },
   {
-    id: 'm10', date: '18. Feb 2026', cat: 'projects', workspace: 'hostautomation', workspace: 'hostautomation', color: 'purple', icon: '📱',
+    id: 'm10', date: '18. Feb 2026', cat: 'projects', workspace: 'hostautomation', color: 'purple', icon: '📱',
     title: 'Google Play Store App Upload',
     body: 'Leon hat Google Play Developer Account (verifiziert). App bereits im Store eingereicht. Nächste Schritte besprochen.',
     tags: ['Google Play', 'App', 'Mobile']
