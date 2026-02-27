@@ -996,6 +996,125 @@ body {
   .team-cards.four { grid-template-columns: repeat(2, 1fr); }
 }
 
+/* ══════════════════════════════════════════
+   LOGIN OVERLAY
+══════════════════════════════════════════ */
+#login-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg);
+  animation: loginFadeIn .5s ease;
+}
+#login-overlay.hidden {
+  opacity: 0; pointer-events: none;
+  transition: opacity .4s ease;
+}
+
+@keyframes loginFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.login-card {
+  width: 380px; max-width: 90vw;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border-hi);
+  border-radius: 20px;
+  padding: 40px 36px 32px;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 24px 80px rgba(0,0,0,.5), 0 0 60px rgba(0,229,255,.06);
+  text-align: center;
+  animation: loginCardIn .6s ease;
+}
+
+@keyframes loginCardIn {
+  from { opacity: 0; transform: translateY(16px) scale(.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.login-logo {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  margin-bottom: 8px;
+}
+.login-logo-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  background: linear-gradient(135deg, #00e5ff, #6c5ce7);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 0 24px rgba(0,229,255,.35);
+}
+.login-logo-text {
+  font-weight: 800; font-size: 22px; color: #fff; letter-spacing: -.02em;
+}
+.login-logo-text span { color: var(--cyan); }
+
+.login-subtitle {
+  font-size: 13px; color: var(--text-dim); margin-bottom: 28px;
+}
+
+.login-form { text-align: left; }
+
+.login-label {
+  display: block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--text-dim); margin-bottom: 8px;
+}
+.login-input {
+  width: 100%; background: rgba(255,255,255,.05);
+  border: 1px solid var(--border-hi); border-radius: 10px;
+  padding: 12px 14px; color: var(--text); font-family: inherit;
+  font-size: 14px; outline: none; transition: border-color .25s, box-shadow .25s;
+}
+.login-input:focus {
+  border-color: rgba(0,229,255,.5);
+  box-shadow: 0 0 0 3px rgba(0,229,255,.1);
+}
+.login-input::placeholder { color: var(--text-faint); }
+
+.login-error {
+  font-size: 12px; color: var(--red); margin-top: 10px;
+  display: none; animation: shake .4s ease;
+}
+.login-error.visible { display: block; }
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-6px); }
+  40%      { transform: translateX(6px); }
+  60%      { transform: translateX(-4px); }
+  80%      { transform: translateX(4px); }
+}
+
+.login-btn {
+  width: 100%; margin-top: 18px; padding: 12px;
+  border: none; border-radius: 10px; cursor: pointer;
+  background: linear-gradient(135deg, #00e5ff, #6c5ce7);
+  color: #0a0a0f; font-family: inherit;
+  font-size: 14px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: opacity .2s, transform .2s;
+}
+.login-btn:hover { opacity: .9; transform: translateY(-1px); }
+.login-btn:active { transform: translateY(0); }
+
+.login-footer {
+  margin-top: 24px; font-size: 11px; color: var(--text-faint);
+}
+
+/* Logout button in sidebar */
+.logout-btn {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; padding: 6px 10px; margin-top: 8px;
+  border-radius: var(--radius-sm); cursor: pointer;
+  font-size: 11px; font-weight: 600; color: var(--text-faint);
+  background: transparent; border: 1px solid transparent;
+  transition: all .2s; font-family: inherit;
+}
+.logout-btn:hover {
+  background: var(--red-dim); border-color: rgba(255,82,82,.2);
+  color: var(--red);
+}
+
 @media (max-width: 900px) {
   :root {
   /* Workspace accent — dynamically changed by JS */
@@ -1022,7 +1141,29 @@ body {
 <div class="bg-glow bg-glow-2"></div>
 <div class="bg-glow bg-glow-3"></div>
 
-<div id="app">
+<!-- ═══════════════════════════════════════
+     LOGIN OVERLAY
+═══════════════════════════════════════ -->
+<div id="login-overlay">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">🚀</div>
+      <div class="login-logo-text">Mission<span>Control</span></div>
+    </div>
+    <div class="login-subtitle">Authentication Required</div>
+    <div class="login-form">
+      <label class="login-label" for="login-token">Access Token</label>
+      <input class="login-input" type="password" id="login-token" placeholder="Enter your access token…" autocomplete="off" spellcheck="false" />
+      <div class="login-error" id="login-error">Invalid token. Access denied.</div>
+      <button class="login-btn" id="login-btn" onclick="attemptLogin()">
+        <span>🔐</span> Login
+      </button>
+    </div>
+    <div class="login-footer">Secured client · Session-based auth</div>
+  </div>
+</div>
+
+<div id="app" style="display:none">
 
   <!-- ═══════════════════════════════════════
        SIDEBAR
@@ -1121,6 +1262,9 @@ body {
         </div>
         <div class="status-dot"></div>
       </div>
+      <button class="logout-btn" onclick="doLogout()" title="Logout">
+        <span>🚪</span><span>Logout</span>
+      </button>
     </div>
   </aside>
 
@@ -1694,6 +1838,75 @@ body {
 ═══════════════════════════════════════ -->
 <script>
 'use strict';
+
+/* ══════════════════════════════════════
+   AUTHENTICATION
+══════════════════════════════════════ */
+const TOKEN_HASH = '7602ce1320ccdf83b0f2fcca781cb0faeeb1c7d2880a245206a95ea18a611359';
+
+async function sha256(text) {
+  const data = new TextEncoder().encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function showApp() {
+  document.getElementById('app').style.display = 'flex';
+  const overlay = document.getElementById('login-overlay');
+  if (overlay) {
+    overlay.classList.add('hidden');
+    setTimeout(() => overlay.style.display = 'none', 400);
+  }
+}
+
+async function attemptLogin() {
+  const input = document.getElementById('login-token');
+  const errorEl = document.getElementById('login-error');
+  const token = input.value.trim();
+  if (!token) { input.focus(); return; }
+
+  const hash = await sha256(token);
+  if (hash === TOKEN_HASH) {
+    sessionStorage.setItem('mc-auth', 'true');
+    errorEl.classList.remove('visible');
+    showApp();
+  } else {
+    errorEl.classList.remove('visible');
+    // Force re-trigger animation
+    void errorEl.offsetWidth;
+    errorEl.classList.add('visible');
+    input.value = '';
+    input.focus();
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('mc-auth');
+  document.getElementById('app').style.display = 'none';
+  const overlay = document.getElementById('login-overlay');
+  if (overlay) {
+    overlay.style.display = 'flex';
+    overlay.classList.remove('hidden');
+  }
+  document.getElementById('login-token').value = '';
+  document.getElementById('login-error').classList.remove('visible');
+  document.getElementById('login-token').focus();
+}
+
+// Check session auth on load
+(function checkAuth() {
+  if (sessionStorage.getItem('mc-auth') === 'true') {
+    showApp();
+  } else {
+    document.getElementById('login-overlay').style.display = 'flex';
+  }
+})();
+
+// Allow Enter key to submit login
+document.getElementById('login-token').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') attemptLogin();
+});
 
 /* ══════════════════════════════════════
    DATA
